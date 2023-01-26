@@ -23,7 +23,7 @@ namespace H1W2D4AQUARIUM.Classes
             Aquarium
         }
 
-        string[] menuItems = new string[] { "Show Aquarium", "Show Fish", "Add Aquarium", "Delete Aquarium", "Add Fish", "Delete Fish", "", "Exit" };
+        string[] menuItems = new string[] { "Show Aquariums", "Show Fish", "Add Aquarium", "Delete Aquarium", "Add Fish", "Delete Fish", "", "Exit" };
 
         public void ShowMenu()
         {
@@ -62,6 +62,8 @@ namespace H1W2D4AQUARIUM.Classes
                     return;
 
                 case ConsoleKey.D2:
+                    Fish.GetFishList();
+                    CurrentViewType=ViewType.Fish;
                     return;
 
                 case ConsoleKey.D3:
