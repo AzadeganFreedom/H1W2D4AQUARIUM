@@ -8,8 +8,9 @@ namespace H1W2D4AQUARIUM.Classes
 {
     internal class DataClass
     {
-        public Fishclass Fish;
+        public FishClass Fish;
         public AquariumClass Aquarium;
+
         public void PrepareProgram()
         {
             if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat"))
@@ -17,9 +18,9 @@ namespace H1W2D4AQUARIUM.Classes
                 File.Create(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat");
             }
 
-            if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "Aq.dat"))
+            if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "Aqaurium.dat"))
             {
-                File.Create(AppDomain.CurrentDomain.BaseDirectory + "Aq.dat");
+                File.Create(AppDomain.CurrentDomain.BaseDirectory + "Aqaurium.dat");
             }
 ;
             LoadData();
@@ -29,22 +30,32 @@ namespace H1W2D4AQUARIUM.Classes
             string jsonData = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat");
             if (!string.IsNullOrWhiteSpace(jsonData))
             {
-                Fish.FishLists = JsonSerializer.Deserialize<List<Fishclass.FishObject>>(jsonData);
+                Fish.FishList = JsonSerializer.Deserialize<List<FishClass.FishObject>>(jsonData);
             }
-            jsonData = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Aq.dat");
+
+
+            jsonData = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Aqaurium.dat");
             if (!string.IsNullOrWhiteSpace(jsonData))
             {
                 Aquarium.AquariumList = JsonSerializer.Deserialize<List<AquariumClass.AquariumObject>>(jsonData);
-
             }
 
         }
-        public void SaveData()
+        public void SaveData(string arg)
         {
-            string jsonData = JsonSerializer.Serialize(Fish.FishLists);
-            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat", jsonData);
-            jsonData = JsonSerializer.Serialize(Aquarium.AquariumList);
-            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Aq.dat", jsonData);
+            string jsonData;
+
+            if (arg == "all" || arg == "fish")
+            {
+                jsonData = JsonSerializer.Serialize(Fish.FishList);
+                File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat", jsonData);
+            }
+
+            if (arg == "all" || arg == "aquarium")
+            {
+                jsonData = JsonSerializer.Serialize(Aquarium.AquariumList);
+                File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Aqaurium.dat", jsonData);
+            }
         }
     }
 }
