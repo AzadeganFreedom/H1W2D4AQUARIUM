@@ -6,56 +6,104 @@ using System.Threading.Tasks;
 
 namespace H1W2D4AQUARIUM.Classes
 {
-    internal class Fishclass
+    internal class FishClass
     {
-        public List<FishObject> FishLists = new List<FishObject>();
+        public DataClass Data;
+        public AquariumClass Aquarium;
+        public List<FishObject> FishList = new List<FishObject>();
+        public MenuClass Menu;
+
+
         public void CreateFish()
         {
-            Console.Clear();
             FishObject NewFish = new FishObject();
+
             string output =
+                "Name: \n" +
                 "Species: \n" +
-                "WaterType: \n" +
+                "Watertype f/s: \n" +
                 "Aquarium: \n";
+
+            Console.CursorVisible = true;
+            Console.SetCursorPosition(0, Menu.cursorStartingIndex);
             Console.WriteLine(output);
-            string species = "";
-            string watertype = "";
-            int aquarium = 0;
+            Console.WriteLine();
+            Console.Write(Aquarium.GetAquariumList());
+
+
             while (true)
             {
-                Console.SetCursorPosition(15, 0);
+                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 0);
+                string input = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    NewFish.Name = input;
+                    break;
+                }
+            }
+
+
+            while (true)
+            {
+                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 1);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
                     NewFish.Species = input;
-                }
-            }
-            while (true)
-            {
-                Console.SetCursorPosition(15, 1);
-                string input = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(input))
-                {
-                    NewFish.Watertype = input;
                     break;
                 }
             }
+
+
             while (true)
             {
-                Console.SetCursorPosition(15, 2);
+                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 2);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
-                    if (int.TryParse(input, out aquarium))
+                    if (input.ToLower() == "f" || input.ToLower() == "s")
+                    {
+                        NewFish.Watertype = input;
+                    }
+                    break;
+                }
+            }
+
+            int aquarium = 0;
+            while (true)
+            {
+                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 3);
+                string input = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    if (int.TryParse(input, out aquarium) && Aquarium.DoAquariumExist(aquarium))
                     {
                         NewFish.Aquarium = aquarium;
                         break;
                     }
                 }
             }
-            //NewAquarium.AquariumId = 1;
-            //AquariumList.Add(NewAquarium);
+
+            NewFish.FishId = FindAvailableId();
+            FishList.Add(NewFish);
+            Data.SaveData("fish");
+
+            Console.Clear();
+
         }
+
+        private int FindAvailableId()
+        {
+            if (FishList.Count == 0)
+            {
+                return 1;
+            }
+
+            int nextId = FishList.Max(id => id.FishId) + 1;
+
+            return nextId;
+        }
+
         public class FishObject
         {
             public int FishId { get; set; }
