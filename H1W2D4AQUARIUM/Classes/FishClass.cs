@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static H1W2D4AQUARIUM.Classes.AquariumClass;
 
 namespace H1W2D4AQUARIUM.Classes
 {
@@ -90,6 +91,60 @@ namespace H1W2D4AQUARIUM.Classes
 
             Console.Clear();
 
+        }
+
+        public void DeleteFish()
+        {
+            Console.WriteLine("Which Fish would like to delete?");
+            Console.Write("Fish ID: ");
+
+            int fishID = 0;
+            while (true)
+            {
+                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 1);
+                string input = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    if (int.TryParse(input, out fishID))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            for (int i = 0; i < FishList.Count; i++)
+            {
+                if (FishList[i].FishId == fishID)
+                {
+                    FishList.RemoveAt(i);
+                    Data.SaveData("fish");
+                    return;
+                }
+            }
+        }
+
+        public string GetFishList()
+        {
+            string output;
+
+            Console.WriteLine();
+
+            if (FishList.Count == 0)
+            {
+                return "";
+            }
+
+            output = "Id".PadRight(5) + "Name".PadRight(15) + "Species".PadRight(12) + "Aquarium".PadRight(16) + "WaterType";
+            Console.WriteLine(output);
+            output = "";
+
+            foreach (FishObject fish in FishList)
+            {
+                output = Convert.ToString(fish.FishId).PadRight(5) + fish.Name.PadRight(15) + fish.Species.PadRight(12) + Aquarium.GetFriendlyName(fish.Aquarium).PadRight(16) + fish.Watertype;
+                Console.WriteLine(output);
+            }
+
+            return "";
         }
 
         private int FindAvailableId()

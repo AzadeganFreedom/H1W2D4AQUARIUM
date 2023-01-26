@@ -17,6 +17,7 @@ namespace H1W2D4AQUARIUM
             Fish.Aquarium = Aquarium;
             Fish.Menu = Menu;
 
+            Aquarium.Menu = Menu;
             Aquarium.Data = Data;
             Fish.Data = Data;
             Menu.Data = Data;

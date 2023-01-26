@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,7 +11,19 @@ namespace H1W2D4AQUARIUM.Classes
     internal class AquariumClass
     {
         public DataClass Data;
+        public MenuClass Menu;
         public List<AquariumObject> AquariumList = new List<AquariumObject>();
+        public string GetFriendlyName(int aquariumID)
+        {
+            foreach (AquariumObject aquarium in AquariumList)
+            {
+                if (aquarium.AquariumId == aquariumID)
+                {
+                    return aquarium.AquariumId + " " + aquarium.Name;
+                }
+            }
+            return null;
+        }
 
         public bool DoAquariumExist(int aquariumID)
         {
@@ -66,7 +80,7 @@ namespace H1W2D4AQUARIUM.Classes
 
             AquariumObject NewAquarium = new AquariumObject();
 
-
+            Console.SetCursorPosition(0, Menu.cursorStartingIndex);
             string output =
                 "Name: \n" +
                 "Size: \n" +
@@ -79,7 +93,7 @@ namespace H1W2D4AQUARIUM.Classes
 
             while (true)
             {
-                Console.SetCursorPosition(15, 0);
+                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 0);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -91,7 +105,7 @@ namespace H1W2D4AQUARIUM.Classes
 
             while (true)
             {
-                Console.SetCursorPosition(15, 1);
+                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 1);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -106,7 +120,7 @@ namespace H1W2D4AQUARIUM.Classes
             string watertype = "";
             while (true)
             {
-                Console.SetCursorPosition(15, 2);
+                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 2);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -121,7 +135,7 @@ namespace H1W2D4AQUARIUM.Classes
             double temperature = 0;
             while (true)
             {
-                Console.SetCursorPosition(15, 3);
+                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 3);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -136,6 +150,36 @@ namespace H1W2D4AQUARIUM.Classes
             NewAquarium.AquariumId = FindAvailableId();
             AquariumList.Add(NewAquarium);
             Data.SaveData("aquarium");
+        }
+
+        public void DeleteAquarium()
+        {
+            Console.WriteLine("Which Aquarium would like to delete?");
+            Console.Write("Aquarium ID: ");
+
+            int aquariumID = 0;
+            while (true)
+            {
+                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 1);
+                string input = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(input))
+                {
+                    if (int.TryParse(input, out aquariumID)&& DoAquariumExist(aquariumID))
+                    {                        
+                        break;
+                    }
+                }
+            }
+
+            for (int i = 0; i < AquariumList.Count; i++)
+            {
+                if (AquariumList[i].AquariumId == aquariumID)
+                {
+                    AquariumList.RemoveAt(i);
+                    Data.SaveData("aquarium");
+                    return;
+                }
+            }
         }
 
         public class AquariumObject
