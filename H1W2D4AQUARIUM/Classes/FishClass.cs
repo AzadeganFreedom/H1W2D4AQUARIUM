@@ -26,7 +26,7 @@ namespace H1W2D4AQUARIUM.Classes
             {
                 Console.Write("You need to have an aquarium before you can get fish, or they will");
                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write("DIE!!");
+                Console.Write(" DIE!!");
                 Console.ForegroundColor = ConsoleColor.Gray;
                 return;
             }
@@ -76,8 +76,8 @@ namespace H1W2D4AQUARIUM.Classes
                 if (!string.IsNullOrWhiteSpace(input))
                 {
                     NewFish.Name = input;
-                       
-                        
+
+
                     break;
                 }
             }
@@ -136,6 +136,7 @@ namespace H1W2D4AQUARIUM.Classes
             }
 
             // Mismatched watertype between fish and aquarium
+            Console.Clear();
             Console.WriteLine("\nYou put the fish in the wrong tank and it died\n");
             Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("YOU MONSTER !!!");

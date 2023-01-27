@@ -61,7 +61,7 @@ namespace H1W2D4AQUARIUM.Classes
             {
                 if (fish.Aquarium == aquarium.AquariumId)
                 {
-                    outPutFishDetails += Convert.ToString(fish.FishId).PadRight(5) + fish.Name.PadRight(15) + fish.Species.PadRight(12);
+                    outPutFishDetails += Convert.ToString(fish.FishId).PadRight(5) + fish.Name.PadRight(15) + fish.Species.PadRight(12) + "\n";
                     numberOfFish++;
                 }
             }
@@ -111,7 +111,7 @@ namespace H1W2D4AQUARIUM.Classes
                 AquariumObject aquarium = AquariumList[i];
 
                 // Apply hover effect to the selected item
-                if (Menu.MenuItemIsActive && Menu.VerticalMenuItemSelected == i)
+                if (Menu.MenuItemIsActive && Menu.VerticalMenuItemSelected == i && Menu.CurrentViewModel != MenuClass.ViewModel.AddFish)
                 {
                     Menu.HoverEffect(true);
                 }
