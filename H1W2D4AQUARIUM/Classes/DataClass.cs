@@ -18,14 +18,14 @@ namespace H1W2D4AQUARIUM.Classes
 
             if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat"))
             {
-                File.Create(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat");
+                using (File.Create(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat")) { }
             }
 
             if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "Aquarium.dat"))
             {
-                File.Create(AppDomain.CurrentDomain.BaseDirectory + "Aquarium.dat");
+                using (File.Create(AppDomain.CurrentDomain.BaseDirectory + "Aquarium.dat")) { }
             }
-;
+
             LoadData();
         }
         public void LoadData()
@@ -80,7 +80,7 @@ namespace H1W2D4AQUARIUM.Classes
         {
             // Serializes AquariumList and save to file
 
-            string jsonData = JsonSerializer.Serialize(Fish.FishList);
+            string jsonData = JsonSerializer.Serialize(Aquarium.AquariumList);
             File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Aquarium.dat", jsonData);
         }
 
@@ -88,7 +88,7 @@ namespace H1W2D4AQUARIUM.Classes
         {
             // Serializes FishList and save to file
 
-            string jsonData = JsonSerializer.Serialize(Aquarium.AquariumList);
+            string jsonData = JsonSerializer.Serialize(Fish.FishList);
             File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat", jsonData);
         }
     }
