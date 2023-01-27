@@ -50,7 +50,7 @@ namespace H1W2D4AQUARIUM.Classes
 
             AquariumObject aquarium = new AquariumObject();
 
-            aquarium = GetAquariumDetails(aquariumPos);
+            aquarium = GetAquariumDetails(aquariumPos, null);
 
             int numberOfFish = 0;
 
@@ -143,11 +143,21 @@ namespace H1W2D4AQUARIUM.Classes
             return nextId;
         }
 
-        public AquariumObject GetAquariumDetails(int aquariumPos)
+        public AquariumObject GetAquariumDetails(int? aquariumPos, int? aquariumId)
         {
             // Returns an AquariumObject based on its position on the list
 
-            return AquariumList[aquariumPos];
+            if (aquariumPos == null)
+            {
+                for (int i = 0; i < AquariumList.Count; i++)
+                {
+                    if (AquariumList[i].AquariumId == aquariumId)
+                    {
+                        return AquariumList[i];
+                    }
+                }
+            }
+            return AquariumList[aquariumPos ?? 0];
         }
 
         public void ShowAddAquariumViewModel()
