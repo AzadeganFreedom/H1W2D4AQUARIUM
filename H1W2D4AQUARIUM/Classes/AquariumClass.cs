@@ -12,6 +12,8 @@ namespace H1W2D4AQUARIUM.Classes
     {
         public DataClass Data;
         public MenuClass Menu;
+        public FishClass Fish;
+
         public List<AquariumObject> AquariumList = new List<AquariumObject>();
         public string GetFriendlyName(int aquariumID)
         {
@@ -19,7 +21,7 @@ namespace H1W2D4AQUARIUM.Classes
             {
                 if (aquarium.AquariumId == aquariumID)
                 {
-                    return aquarium.AquariumId + " " + aquarium.Name;
+                    return "[" + aquarium.AquariumId + "] " + aquarium.Name;
                 }
             }
             return null;
@@ -38,25 +40,76 @@ namespace H1W2D4AQUARIUM.Classes
             return false;
         }
 
-        public string GetAquariumList()
+        public void ShowAquariumDetails(int aquariumPos)
+        {
+            AquariumObject aquarium = new AquariumObject();
+
+            aquarium = GetAquariumDetails(aquariumPos);
+
+            int numberOfFish = 0;
+
+            string outPutFishDetails = "";
+
+            foreach (FishClass.FishObject fish in Fish.FishList)
+            {
+                if (fish.Aquarium == aquarium.AquariumId)
+                {
+                    outPutFishDetails += Convert.ToString(fish.FishId).PadRight(5) + fish.Name.PadRight(15) + fish.Species.PadRight(12);
+                    numberOfFish++;
+                }
+            }
+
+            string outputAquariumDetails =
+                "Id: ".PadRight(17) + aquarium.AquariumId +
+                "\nName: ".PadRight(17) + aquarium.Name +
+                "\nTemperature: ".PadRight(17) + aquarium.temperature.ToString() +
+                "\nSize: ".PadRight(17) + aquarium.Size.ToString() +
+                "\nWatertype: ".PadRight(17) + aquarium.Watertype +
+                "\nNumber of fish: ".PadRight(17) + numberOfFish.ToString();
+
+
+            Console.WriteLine(outputAquariumDetails);
+            Console.WriteLine();
+            Console.WriteLine("Fish Overview");
+
+
+            if (numberOfFish > 0)
+            {
+                Console.WriteLine("Id".PadRight(5) + "Name".PadRight(15) + "Species".PadRight(12));
+                Console.Write(outPutFishDetails);
+            }
+        }
+
+        public string ShowAquariumList()
         {
             string output;
-
-            Console.WriteLine();
 
             if (AquariumList.Count == 0)
             {
                 return "";
             }
 
+            Console.WriteLine("Aquariums:\n");
+
             output = "Id".PadRight(5) + "Name".PadRight(15) + "Watertype".PadRight(12) + "Temperature".PadRight(14) + "Size";
             Console.WriteLine(output);
             output = "";
 
-            foreach (AquariumObject aquarium in AquariumList)
+            for (int i = 0; i < AquariumList.Count; i++)
             {
+                AquariumObject aquarium = AquariumList[i];
+                if (Menu.MenuItemIsActive && Menu.VerticalMenuItemSelected == i)
+                {
+                    Menu.HoverEfftect(true);
+                }
+
                 output = Convert.ToString(aquarium.AquariumId).PadRight(5) + aquarium.Name.PadRight(15) + aquarium.Watertype.PadRight(12) + Convert.ToString(aquarium.temperature).PadRight(14) + Convert.ToString(aquarium.Size);
                 Console.WriteLine(output);
+
+                if (Menu.MenuItemIsActive)
+                {
+                    Menu.HoverEfftect(false);
+                }
             }
 
             return "";
@@ -74,26 +127,48 @@ namespace H1W2D4AQUARIUM.Classes
             return nextId;
         }
 
-        public void CreateAquarium()
+        public AquariumObject GetAquariumDetails(int aquariumPos)
+        {
+            return AquariumList[aquariumPos];
+        }
+
+        public void ShowAddAquariumViewModel()
+        {
+
+            Console.WriteLine("Add new aquarium: \n");
+
+            string output =
+                "Name: \n" +
+                "Size in liters :\n" +
+                "Watertype f/s: \n" +
+                "Temperature (c): \n";
+
+            Console.WriteLine(output);
+
+        }
+
+        public void AddAquarium()
         {
             Console.CursorVisible = true;
 
             AquariumObject NewAquarium = new AquariumObject();
 
-            Console.SetCursorPosition(0, Menu.cursorStartingIndex);
+            Console.WriteLine("Add new aquarium:\n");
+
             string output =
                 "Name: \n" +
-                "Size: \n" +
+                "Size in liters :\n" +
                 "Watertype f/s: \n" +
-                "Temperature: \n";
+                "Temperature (c): \n";
 
             Console.WriteLine(output);
 
+            int startingLine = 5;
             int size = 0;
 
             while (true)
             {
-                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 0);
+                Console.SetCursorPosition(19, startingLine + 0);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -105,7 +180,7 @@ namespace H1W2D4AQUARIUM.Classes
 
             while (true)
             {
-                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 1);
+                Console.SetCursorPosition(19, startingLine + 1);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -120,7 +195,7 @@ namespace H1W2D4AQUARIUM.Classes
             string watertype = "";
             while (true)
             {
-                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 2);
+                Console.SetCursorPosition(19, startingLine + 2);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -135,7 +210,7 @@ namespace H1W2D4AQUARIUM.Classes
             double temperature = 0;
             while (true)
             {
-                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 3);
+                Console.SetCursorPosition(19, startingLine + 3);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -152,34 +227,28 @@ namespace H1W2D4AQUARIUM.Classes
             Data.SaveData("aquarium");
         }
 
-        public void DeleteAquarium()
+        public void RemoveAquarium(int aquariumPos)
         {
-            Console.WriteLine("Which Aquarium would like to delete?");
-            Console.Write("Aquarium ID: ");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("You are currently trying to delete this item :");
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.WriteLine(GetFriendlyName(AquariumList[aquariumPos].AquariumId));
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("This action cannot be undone. \n are you sure this is what you want to do?");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine("y/n");
 
-            int aquariumID = 0;
-            while (true)
+            bool DeleteThis = Menu.ConfirmAction();
+
+            if (DeleteThis)
             {
-                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 1);
-                string input = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(input))
-                {
-                    if (int.TryParse(input, out aquariumID)&& DoAquariumExist(aquariumID))
-                    {                        
-                        break;
-                    }
-                }
+                AquariumList.RemoveAt(aquariumPos);
+                Data.SaveData("aquarium");
+                Menu.MenuItemIsActive = false;
+                Menu.ShowMenu();
             }
 
-            for (int i = 0; i < AquariumList.Count; i++)
-            {
-                if (AquariumList[i].AquariumId == aquariumID)
-                {
-                    AquariumList.RemoveAt(i);
-                    Data.SaveData("aquarium");
-                    return;
-                }
-            }
+
         }
 
         public class AquariumObject
