@@ -10,7 +10,23 @@ namespace H1W2D4AQUARIUM
         static DataClass Data = new DataClass();
         static void Main(string[] args)
         {
-            // Build references
+            BuildReferences();
+            Data.PrepareProgram();
+
+            Menu.CurrentViewModel = MenuClass.ViewModel.AquariumList;
+            Console.CursorVisible = false;
+
+            while (true)
+            {
+                Menu.ShowMenu();
+                Menu.SelectMenuItem();
+            }
+
+        }
+
+        private static void BuildReferences()
+        {
+            // Build references for our classes
             Data.Aquarium = Aquarium;
             Data.Fish = Fish;
 
@@ -26,18 +42,6 @@ namespace H1W2D4AQUARIUM
 
             Menu.Fish = Fish;
             Menu.Aquarium = Aquarium;
-
-            Data.PrepareProgram();
-
-            Menu.CurrentViewModel = MenuClass.ViewModel.AquariumList;
-            Console.CursorVisible = false;
-
-            while (true)
-            {
-                Menu.ShowMenu();
-                Menu.SelectMenuItem();
-            }
-
         }
     }
 }
