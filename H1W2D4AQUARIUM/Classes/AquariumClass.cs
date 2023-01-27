@@ -200,10 +200,16 @@ namespace H1W2D4AQUARIUM.Classes
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
-                    NewAquarium.Name = input;
+                    if (input.Length > 15)
+                    {
+                        NewAquarium.Name = input.Substring(0, 15);
+                    }
+                    else
+                    {
+                        NewAquarium.Name = input;
+                    }
                     break;
                 }
-
             }
 
             while (true)
