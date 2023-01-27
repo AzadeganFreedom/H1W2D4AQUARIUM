@@ -75,9 +75,14 @@ namespace H1W2D4AQUARIUM.Classes
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
-                    NewFish.Name = input;
-
-
+                    if (input.Length > 15)
+                    {
+                        NewFish.Name = input.Substring(0, 15);
+                    }
+                    else
+                    {
+                        NewFish.Name = input;
+                    }
                     break;
                 }
             }
@@ -89,7 +94,14 @@ namespace H1W2D4AQUARIUM.Classes
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
-                    NewFish.Species = input;
+                    if (input.Length > 15)
+                    {
+                        NewFish.Species = input.Substring(0, 15);
+                    }
+                    else
+                    {
+                        NewFish.Species = input;
+                    }
                     break;
                 }
             }
