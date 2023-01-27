@@ -8,11 +8,14 @@ namespace H1W2D4AQUARIUM.Classes
 {
     internal class DataClass
     {
+        // Adding classes so that we can access the data in them. We could also just send the data as objects and handle it that way.
         public FishClass Fish;
         public AquariumClass Aquarium;
 
         public void PrepareProgram()
         {
+            // Makes sure that the required data files exist. If they do not we create them. Then we load the data
+
             if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat"))
             {
                 File.Create(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat");
@@ -27,12 +30,16 @@ namespace H1W2D4AQUARIUM.Classes
         }
         public void LoadData()
         {
+            //Loads the relevant data
+
             LoadAquarium();
             LoadFish();
         }
 
         private void LoadAquarium()
         {
+            // Check that there are contents in the files and then load them. We could potentially add another layer of validation and make sure the file is not corrupt
+
             string jsonData = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Aqaurium.dat");
             if (!string.IsNullOrWhiteSpace(jsonData))
             {
@@ -42,6 +49,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         private void LoadFish()
         {
+            // Check that there are contents in the files and then load them. We could potentially add another layer of validation and make sure the file is not corrupt
+
             string jsonData = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat");
             if (!string.IsNullOrWhiteSpace(jsonData))
             {
@@ -52,6 +61,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         public void SaveData(string arg)
         {
+            // Saves data based on the passed in arguments as we only want to update the files if they have changes
+
             string jsonData;
 
             if (arg == "all" || arg == "fish")
@@ -67,12 +78,16 @@ namespace H1W2D4AQUARIUM.Classes
 
         private void SaveAquarium()
         {
+            // Serializes AquariumList and save to file
+
             string jsonData = JsonSerializer.Serialize(Fish.FishList);
             File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat", jsonData);
         }
 
         private void SaveFish()
         {
+            // Serializes FishList and save to file
+
             string jsonData = JsonSerializer.Serialize(Aquarium.AquariumList);
             File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Aqaurium.dat", jsonData);
         }

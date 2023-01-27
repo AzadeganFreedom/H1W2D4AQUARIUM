@@ -13,12 +13,12 @@ namespace H1W2D4AQUARIUM.Classes
         public AquariumClass Aquarium;
         public FishClass Fish;
         public DataClass Data;
-        public ViewModel CurrentViewModel { get; set; }
+        public ViewModel CurrentViewModel { get; set; } // Determines what text the console loads
 
-        public int HorizontalMenuItemSelected = 0;
-        public int VerticalMenuItemSelected = 0;
+        public int HorizontalMenuItemSelected = 0; // Used for main menu navigation
+        public int VerticalMenuItemSelected = 0; // User for sub menu navigation
 
-        public bool MenuItemIsActive = false;
+        public bool MenuItemIsActive = false; // Keeps track of wether or not we are inside a sub menu
 
         public enum ViewModel
         {
@@ -37,28 +37,29 @@ namespace H1W2D4AQUARIUM.Classes
 
         public void ShowMenu()
         {
+            // Shows the main menu then adds the context/sub menu
 
             Console.Clear();
 
             Console.SetCursorPosition(3, 0);
             Console.Write("Menu |");
 
+            // Loads the menu items
             for (int i = 0; i < menuItems.Length; i++)
             {
                 if (HorizontalMenuItemSelected == i && !MenuItemIsActive)
                 {
-
+                    // If the current menu items is selected and no submenu is active. Main menu item gets highlighted
                     Console.Write(" ");
-                    HoverEfftect(true);
+                    HoverEffect(true);
                     Console.Write(menuItems[i]);
-                    HoverEfftect(false);
+                    HoverEffect(false);
 
                     Console.Write(" |");
-
                 }
                 else if (HorizontalMenuItemSelected == i && MenuItemIsActive)
                 {
-
+                    // If the current menu items is selected and a submenu is active. Main menu item gets inactive effect applied
                     Console.Write(" ");
                     ApplyInactiveEffect(true);
                     Console.Write(menuItems[i]);
@@ -68,10 +69,12 @@ namespace H1W2D4AQUARIUM.Classes
                 }
                 else
                 {
+                    // If no special rules are present we just display the item normally
                     Console.Write($" {menuItems[i]} |");
                 }
             }
 
+            // Adding a line to seperate the main menu from the context menu. Then sets cursor pos so context menu gets displayed in the correct position
             Console.SetCursorPosition(0, 1);
             DrawLine();
             Console.SetCursorPosition(0, 3);
@@ -83,6 +86,7 @@ namespace H1W2D4AQUARIUM.Classes
 
         public void LoadViewModel(ViewModel viewModel)
         {
+            // Loads the context menu based on the currently active ViewModel
 
             switch (viewModel)
             {
@@ -135,6 +139,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         public void ApplyInactiveEffect(bool apply)
         {
+            // Used on the main menu item when a context/sub menu is active
+
             if (apply)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
@@ -146,8 +152,10 @@ namespace H1W2D4AQUARIUM.Classes
             Console.ForegroundColor = ConsoleColor.Gray;
         }
 
-        public void HoverEfftect(bool apply)
+        public void HoverEffect(bool apply)
         {
+            // Apply a highlight effect to the currently select menu items
+
             if (apply)
             {
                 Console.BackgroundColor = ConsoleColor.Blue;
@@ -161,6 +169,7 @@ namespace H1W2D4AQUARIUM.Classes
 
         private void DrawLine()
         {
+            // Writes out a line that matches the width of the console. Used to seperate main menu from context menu
 
             for (int i = 0; i < Console.WindowWidth; i++)
             {
@@ -170,6 +179,8 @@ namespace H1W2D4AQUARIUM.Classes
         }
         public void SelectMenuItem()
         {
+            // Used for menu navigation
+
             ConsoleKeyInfo consoleKey;
 
             Console.CursorVisible = false;
@@ -201,6 +212,7 @@ namespace H1W2D4AQUARIUM.Classes
                     ChangeVerticalMenuItem(1, "down");
                     return;
 
+                // If a menu is active we need to send the keypress to the active context/sub menu instead of the main menu 
                 case ConsoleKey.Enter:
                     if (MenuItemIsActive)
                     {
@@ -219,6 +231,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         private void PressEnterOnActiveMenu()
         {
+            // Runs condionally if there is an active context/sub menu
+
             switch (CurrentViewModel)
             {
                 case ViewModel.FishList:
@@ -247,6 +261,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         private void ChangeVerticalMenuItem(int valueModifier, string keyInitiator)
         {
+            // Handles changing of the vertical selected item on the context/sub menu
+
             int MenuLowerLimit = 0;
             int MenuUpperLimit = 0;
 
@@ -280,44 +296,53 @@ namespace H1W2D4AQUARIUM.Classes
 
             }
 
+            // If we are on the main menu and press down we go into the context/sub menu
             if (valueModifier == 1 && !MenuItemIsActive)
             {
                 MenuItemIsActive = true;
                 return;
             }
 
+            // We need to make sure that we do not try to lookout a non existing menu item
             if (valueModifier == -1 && VerticalMenuItemSelected == MenuLowerLimit)
             {
                 MenuItemIsActive = false;
                 return;
             }
 
+            // We need to make sure that we do not try to lookout a non existing menu item
             if (valueModifier == 1 && VerticalMenuItemSelected == MenuUpperLimit)
             {
                 return;
             }
 
+            // If all checks are passed we change what item is selected
             VerticalMenuItemSelected += valueModifier;
-
         }
 
         private void ChangeHorizontalMenuItem(int valueModifier)
         {
+            // Handles changin of the horizontal oriented item on the main menu
+
+            // If we are in a context/sub menu we ignore input that should only be valid for the main menu (arrowkey[left] and arrowkey[right])
             if (MenuItemIsActive)
             {
                 return;
             }
 
+            // Make sure the selection is valid
             if (valueModifier == -1 && HorizontalMenuItemSelected == 0)
             {
                 return;
             }
 
+            // Make sure the selection is valid
             if (valueModifier == 1 && HorizontalMenuItemSelected == menuItems.Length - 1)
             {
                 return;
             }
 
+            // If all checks are passed update the selected menu item
             HorizontalMenuItemSelected += valueModifier;
             SetCurrentlySelectedMenuItem();
             ShowMenu();
@@ -325,6 +350,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         private void SetCurrentlySelectedMenuItem()
         {
+            // Loads context/sub menu based on the currently selected menu item
+
             switch (menuItems[HorizontalMenuItemSelected])
             {
                 case "Show Aquariums":
@@ -360,7 +387,9 @@ namespace H1W2D4AQUARIUM.Classes
 
         public bool ConfirmAction()
         {
-            ConsoleKeyInfo consoleKey = Console.ReadKey(true); // User needs to confirm that they want to delete the selected task
+            // This method asks the user to verify their current actions
+
+            ConsoleKeyInfo consoleKey = Console.ReadKey(true);
 
             switch (consoleKey.Key)
             {

@@ -18,8 +18,10 @@ namespace H1W2D4AQUARIUM.Classes
 
         public void ShowCreateFishViewModel()
         {
+            // Used as context/sub menu when the Add Fish menu is hovered
             Console.WriteLine("Fish:\n");
 
+            // You can not add fish unless you have an aquarium
             if (Aquarium.AquariumList.Count == 0)
             {
                 Console.Write("You need to have an aquarium before you can get fish, or they will");
@@ -37,16 +39,24 @@ namespace H1W2D4AQUARIUM.Classes
 
             Console.WriteLine(output);
             Console.WriteLine();
+
+            // Displays an overview over the aquariums
             Console.Write(Aquarium.ShowAquariumList());
 
         }
 
         public void AddFish()
         {
+            // Handles adding fish to aqauriums
+
             FishObject NewFish = new FishObject();
 
             Console.CursorVisible = true;
             Console.WriteLine("Fish:\n");
+
+            // Easy way to manipulate where we write our text
+            int startingLine = 5;
+            Console.SetCursorPosition(0, startingLine);
 
             string output =
                 "Name: \n" +
@@ -58,8 +68,7 @@ namespace H1W2D4AQUARIUM.Classes
             Console.WriteLine();
             Console.Write(Aquarium.ShowAquariumList());
 
-            int startingLine = 5;
-
+            // Name input is valid?
             while (true)
             {
                 Console.SetCursorPosition(15, startingLine + 0);
@@ -71,7 +80,7 @@ namespace H1W2D4AQUARIUM.Classes
                 }
             }
 
-
+            // Species input is valid?. We might want to add a species "selecter" instead
             while (true)
             {
                 Console.SetCursorPosition(15, startingLine + 1);
@@ -83,7 +92,7 @@ namespace H1W2D4AQUARIUM.Classes
                 }
             }
 
-
+            // Watertype input is valid?. We might want to translate input to "Freshwater" and "Saltwater"
             while (true)
             {
                 Console.SetCursorPosition(15, startingLine + 2);
@@ -98,6 +107,7 @@ namespace H1W2D4AQUARIUM.Classes
                 }
             }
 
+            // Aquarium check if input can be converted to int. Then checks if the Aquarium exist
             int aquarium = 0;
             while (true)
             {
@@ -113,6 +123,7 @@ namespace H1W2D4AQUARIUM.Classes
                 }
             }
 
+            // Checks to make sure the fish can actually live in the aquarium. We might want to do a size check as well
             if (NewFish.Watertype == Aquarium.GetAquariumDetails(NewFish.Aquarium).Watertype)
             {
                 NewFish.FishId = FindAvailableId();
@@ -122,6 +133,7 @@ namespace H1W2D4AQUARIUM.Classes
                 return;
             }
 
+            // Mismatched watertype between fish and aquarium
             Console.WriteLine("\nYou put the fish in the wrong tank and it died\n");
             Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("YOU MONSTER !!!");
@@ -134,6 +146,9 @@ namespace H1W2D4AQUARIUM.Classes
 
         public void RemoveFish(int fishPos)
         {
+            // Removes the fish
+
+            // Warns the user that they are about to delete some data
             Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("You are currently trying to delete this item :");
             Console.ForegroundColor = ConsoleColor.DarkBlue;
@@ -143,8 +158,10 @@ namespace H1W2D4AQUARIUM.Classes
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.WriteLine("y/n");
 
+            // Checks for user confirmation
             bool DeleteThis = Menu.ConfirmAction();
 
+            // Removes the fish
             if (DeleteThis)
             {
                 FishList.RemoveAt(fishPos);
@@ -157,6 +174,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         public string GetFriendlyName(int id)
         {
+            //Used to return Fish Id together with name.
+
             foreach (FishObject fish in FishList)
             {
                 if (fish.FishId == id)
@@ -170,10 +189,15 @@ namespace H1W2D4AQUARIUM.Classes
 
         public string ShowFishList()
         {
+            // Writes list of all fish to the console
+            // We no longer need a return type as we changed the method from GetFishList to ShowFishList
+
             string output;
 
+            // Before we try to write 
             if (FishList.Count == 0)
             {
+                Console.WriteLine("You got no fish yet :-(");
                 return "";
             }
 
@@ -181,23 +205,25 @@ namespace H1W2D4AQUARIUM.Classes
 
             output = "Id".PadRight(5) + "Name".PadRight(15) + "Species".PadRight(12) + "Aquarium".PadRight(25) + "WaterType";
             Console.WriteLine(output);
-            output = "";
 
+            // Outputs a list of all the fish to console
             for (int i = 0; i < FishList.Count; i++)
             {
                 FishObject fish = FishList[i];
 
+                // Apply the hover effect if the fish is currently selected
                 if (Menu.MenuItemIsActive && Menu.VerticalMenuItemSelected == i)
                 {
-                    Menu.HoverEfftect(true);
+                    Menu.HoverEffect(true);
                 }
 
                 output = Convert.ToString(fish.FishId).PadRight(5) + fish.Name.PadRight(15) + fish.Species.PadRight(12) + Aquarium.GetFriendlyName(fish.Aquarium).PadRight(25) + fish.Watertype;
                 Console.WriteLine(output);
 
+                // Ensures that the hover effect is only applied to the relevant line
                 if (Menu.MenuItemIsActive)
                 {
-                    Menu.HoverEfftect(false);
+                    Menu.HoverEffect(false);
                 }
 
             }
@@ -207,11 +233,15 @@ namespace H1W2D4AQUARIUM.Classes
 
         private int FindAvailableId()
         {
+            //Finds the next id 
+
+            // If there is no fish in the list we can safely assume that 1 is available as id
             if (FishList.Count == 0)
             {
                 return 1;
             }
 
+            // Lambda "function" that finds the highest currently used id. Then adds 1 and returns it as the next available id
             int nextId = FishList.Max(id => id.FishId) + 1;
 
             return nextId;

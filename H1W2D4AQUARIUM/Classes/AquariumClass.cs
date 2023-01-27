@@ -17,6 +17,8 @@ namespace H1W2D4AQUARIUM.Classes
         public List<AquariumObject> AquariumList = new List<AquariumObject>();
         public string GetFriendlyName(int aquariumID)
         {
+            //Used to return Aquarium Id together with name.
+
             foreach (AquariumObject aquarium in AquariumList)
             {
                 if (aquarium.AquariumId == aquariumID)
@@ -29,6 +31,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         public bool DoAquariumExist(int aquariumID)
         {
+            // Check to see if the aquarium exists. Used in AddFish.
+
             foreach (AquariumObject aquarium in AquariumList)
             {
                 if (aquarium.AquariumId == aquariumID)
@@ -42,6 +46,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         public void ShowAquariumDetails(int aquariumPos)
         {
+            // Used to display aquarium details along with a list of all the fish in the selected aquarium
+
             AquariumObject aquarium = new AquariumObject();
 
             aquarium = GetAquariumDetails(aquariumPos);
@@ -50,6 +56,7 @@ namespace H1W2D4AQUARIUM.Classes
 
             string outPutFishDetails = "";
 
+            // Builds the fish list and prepares it for output. We build it here because we need some of the data for the aquarium info.
             foreach (FishClass.FishObject fish in Fish.FishList)
             {
                 if (fish.Aquarium == aquarium.AquariumId)
@@ -59,6 +66,8 @@ namespace H1W2D4AQUARIUM.Classes
                 }
             }
 
+
+            // Displays the aquarium details
             string outputAquariumDetails =
                 "Id: ".PadRight(17) + aquarium.AquariumId +
                 "\nName: ".PadRight(17) + aquarium.Name +
@@ -70,11 +79,11 @@ namespace H1W2D4AQUARIUM.Classes
 
             Console.WriteLine(outputAquariumDetails);
             Console.WriteLine();
-            Console.WriteLine("Fish Overview");
 
-
+            // Only show the fish table if the is actually some fish to display
             if (numberOfFish > 0)
             {
+                Console.WriteLine("Fish Overview");
                 Console.WriteLine("Id".PadRight(5) + "Name".PadRight(15) + "Species".PadRight(12));
                 Console.Write(outPutFishDetails);
             }
@@ -82,6 +91,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         public string ShowAquariumList()
         {
+            // Shows a list of all aquariums
+
             string output;
 
             if (AquariumList.Count == 0)
@@ -98,17 +109,20 @@ namespace H1W2D4AQUARIUM.Classes
             for (int i = 0; i < AquariumList.Count; i++)
             {
                 AquariumObject aquarium = AquariumList[i];
+
+                // Apply hover effect to the selected item
                 if (Menu.MenuItemIsActive && Menu.VerticalMenuItemSelected == i)
                 {
-                    Menu.HoverEfftect(true);
+                    Menu.HoverEffect(true);
                 }
 
                 output = Convert.ToString(aquarium.AquariumId).PadRight(5) + aquarium.Name.PadRight(15) + aquarium.Watertype.PadRight(12) + Convert.ToString(aquarium.temperature).PadRight(14) + Convert.ToString(aquarium.Size);
                 Console.WriteLine(output);
 
+                // Make sure hover effect is not applied to the wrong items
                 if (Menu.MenuItemIsActive)
                 {
-                    Menu.HoverEfftect(false);
+                    Menu.HoverEffect(false);
                 }
             }
 
@@ -117,6 +131,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         private int FindAvailableId()
         {
+            // Returns a unique id
+
             if (AquariumList.Count == 0)
             {
                 return 1;
@@ -129,6 +145,8 @@ namespace H1W2D4AQUARIUM.Classes
 
         public AquariumObject GetAquariumDetails(int aquariumPos)
         {
+            // Returns an AquariumObject based on its position on the list
+
             return AquariumList[aquariumPos];
         }
 
