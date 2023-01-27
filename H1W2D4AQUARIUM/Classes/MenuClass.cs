@@ -106,6 +106,8 @@ namespace H1W2D4AQUARIUM.Classes
                     else if (Aquarium.AquariumList.Count > 0)
                     {
                         Fish.AddFish();
+                        MenuItemIsActive = false;
+                        ShowMenu();
                     }
                     return;
 
@@ -125,6 +127,8 @@ namespace H1W2D4AQUARIUM.Classes
                     else
                     {
                         Aquarium.AddAquarium();
+                        MenuItemIsActive = false;
+                        ShowMenu();
                     }
                     return;
 

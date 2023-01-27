@@ -81,7 +81,7 @@ namespace H1W2D4AQUARIUM.Classes
             // Serializes AquariumList and save to file
 
             string jsonData = JsonSerializer.Serialize(Fish.FishList);
-            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat", jsonData);
+            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Aquarium.dat", jsonData);
         }
 
         private void SaveFish()
@@ -89,7 +89,7 @@ namespace H1W2D4AQUARIUM.Classes
             // Serializes FishList and save to file
 
             string jsonData = JsonSerializer.Serialize(Aquarium.AquariumList);
-            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Aqaurium.dat", jsonData);
+            File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat", jsonData);
         }
     }
 }

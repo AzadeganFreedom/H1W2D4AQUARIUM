@@ -76,6 +76,8 @@ namespace H1W2D4AQUARIUM.Classes
                 if (!string.IsNullOrWhiteSpace(input))
                 {
                     NewFish.Name = input;
+                       
+                        
                     break;
                 }
             }
@@ -124,7 +126,7 @@ namespace H1W2D4AQUARIUM.Classes
             }
 
             // Checks to make sure the fish can actually live in the aquarium. We might want to do a size check as well
-            if (NewFish.Watertype == Aquarium.GetAquariumDetails(NewFish.Aquarium).Watertype)
+            if (NewFish.Watertype == Aquarium.GetAquariumDetails(null, NewFish.Aquarium).Watertype)
             {
                 NewFish.FishId = FindAvailableId();
                 FishList.Add(NewFish);
