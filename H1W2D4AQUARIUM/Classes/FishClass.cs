@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static H1W2D4AQUARIUM.Classes.AquariumClass;
+using static System.Collections.Specialized.BitVector32;
 
 namespace H1W2D4AQUARIUM.Classes
 {
@@ -15,9 +16,18 @@ namespace H1W2D4AQUARIUM.Classes
         public MenuClass Menu;
 
 
-        public void CreateFish()
+        public void ShowCreateFishViewModel()
         {
-            FishObject NewFish = new FishObject();
+            Console.WriteLine("Fish:\n");
+
+            if (Aquarium.AquariumList.Count == 0)
+            {
+                Console.Write("You need to have an aquarium before you can get fish, or they will");
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.Write("DIE!!");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                return;
+            }
 
             string output =
                 "Name: \n" +
@@ -25,16 +35,34 @@ namespace H1W2D4AQUARIUM.Classes
                 "Watertype f/s: \n" +
                 "Aquarium: \n";
 
-            Console.CursorVisible = true;
-            Console.SetCursorPosition(0, Menu.cursorStartingIndex);
             Console.WriteLine(output);
             Console.WriteLine();
-            Console.Write(Aquarium.GetAquariumList());
+            Console.Write(Aquarium.ShowAquariumList());
 
+        }
+
+        public void AddFish()
+        {
+            FishObject NewFish = new FishObject();
+
+            Console.CursorVisible = true;
+            Console.WriteLine("Fish:\n");
+
+            string output =
+                "Name: \n" +
+                "Species: \n" +
+                "Watertype f/s: \n" +
+                "Aquarium: \n";
+
+            Console.WriteLine(output);
+            Console.WriteLine();
+            Console.Write(Aquarium.ShowAquariumList());
+
+            int startingLine = 5;
 
             while (true)
             {
-                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 0);
+                Console.SetCursorPosition(15, startingLine + 0);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -46,7 +74,7 @@ namespace H1W2D4AQUARIUM.Classes
 
             while (true)
             {
-                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 1);
+                Console.SetCursorPosition(15, startingLine + 1);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -58,7 +86,7 @@ namespace H1W2D4AQUARIUM.Classes
 
             while (true)
             {
-                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 2);
+                Console.SetCursorPosition(15, startingLine + 2);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -73,7 +101,7 @@ namespace H1W2D4AQUARIUM.Classes
             int aquarium = 0;
             while (true)
             {
-                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 3);
+                Console.SetCursorPosition(15, startingLine + 3);
                 string input = Console.ReadLine();
                 if (!string.IsNullOrWhiteSpace(input))
                 {
@@ -85,63 +113,93 @@ namespace H1W2D4AQUARIUM.Classes
                 }
             }
 
-            NewFish.FishId = FindAvailableId();
-            FishList.Add(NewFish);
-            Data.SaveData("fish");
+            if (NewFish.Watertype == Aquarium.GetAquariumDetails(NewFish.Aquarium).Watertype)
+            {
+                NewFish.FishId = FindAvailableId();
+                FishList.Add(NewFish);
+                Data.SaveData("fish");
+                Menu.MenuItemIsActive = false;
+                return;
+            }
 
-            Console.Clear();
+            Console.WriteLine("\nYou put the fish in the wrong tank and it died\n");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("YOU MONSTER !!!");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.CursorVisible = false;
+            Console.ReadKey();
+
 
         }
 
-        public void DeleteFish()
+        public void RemoveFish(int fishPos)
         {
-            Console.WriteLine("Which Fish would like to delete?");
-            Console.Write("Fish ID: ");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("You are currently trying to delete this item :");
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.WriteLine(GetFriendlyName(FishList[fishPos].FishId));
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("This action cannot be undone. \n are you sure this is what you want to do?");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine("y/n");
 
-            int fishID = 0;
-            while (true)
+            bool DeleteThis = Menu.ConfirmAction();
+
+            if (DeleteThis)
             {
-                Console.SetCursorPosition(15, Menu.cursorStartingIndex + 1);
-                string input = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(input))
-                {
-                    if (int.TryParse(input, out fishID))
-                    {
-                        break;
-                    }
-                }
+                FishList.RemoveAt(fishPos);
+                Data.SaveData("fish");
+                Menu.MenuItemIsActive = false;
+                Menu.ShowMenu();
             }
 
-            for (int i = 0; i < FishList.Count; i++)
-            {
-                if (FishList[i].FishId == fishID)
-                {
-                    FishList.RemoveAt(i);
-                    Data.SaveData("fish");
-                    return;
-                }
-            }
         }
 
-        public string GetFishList()
+        public string GetFriendlyName(int id)
+        {
+            foreach (FishObject fish in FishList)
+            {
+                if (fish.FishId == id)
+                {
+                    return "[" + fish.FishId + "] " + fish.Name;
+                }
+            }
+            return null;
+
+        }
+
+        public string ShowFishList()
         {
             string output;
-
-            Console.WriteLine();
 
             if (FishList.Count == 0)
             {
                 return "";
             }
 
-            output = "Id".PadRight(5) + "Name".PadRight(15) + "Species".PadRight(12) + "Aquarium".PadRight(16) + "WaterType";
+            Console.WriteLine("Fish:\n");
+
+            output = "Id".PadRight(5) + "Name".PadRight(15) + "Species".PadRight(12) + "Aquarium".PadRight(25) + "WaterType";
             Console.WriteLine(output);
             output = "";
 
-            foreach (FishObject fish in FishList)
+            for (int i = 0; i < FishList.Count; i++)
             {
-                output = Convert.ToString(fish.FishId).PadRight(5) + fish.Name.PadRight(15) + fish.Species.PadRight(12) + Aquarium.GetFriendlyName(fish.Aquarium).PadRight(16) + fish.Watertype;
+                FishObject fish = FishList[i];
+
+                if (Menu.MenuItemIsActive && Menu.VerticalMenuItemSelected == i)
+                {
+                    Menu.HoverEfftect(true);
+                }
+
+                output = Convert.ToString(fish.FishId).PadRight(5) + fish.Name.PadRight(15) + fish.Species.PadRight(12) + Aquarium.GetFriendlyName(fish.Aquarium).PadRight(25) + fish.Watertype;
                 Console.WriteLine(output);
+
+                if (Menu.MenuItemIsActive)
+                {
+                    Menu.HoverEfftect(false);
+                }
+
             }
 
             return "";

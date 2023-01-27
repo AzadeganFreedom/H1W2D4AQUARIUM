@@ -19,6 +19,8 @@ namespace H1W2D4AQUARIUM
 
             Aquarium.Menu = Menu;
             Aquarium.Data = Data;
+            Aquarium.Fish = Fish;
+
             Fish.Data = Data;
             Menu.Data = Data;
 
@@ -27,6 +29,8 @@ namespace H1W2D4AQUARIUM
 
             Data.PrepareProgram();
 
+            Menu.CurrentViewModel = MenuClass.ViewModel.AquariumList;
+            Console.CursorVisible = false;
 
             while (true)
             {
