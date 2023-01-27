@@ -40,7 +40,7 @@ namespace H1W2D4AQUARIUM.Classes
         {
             // Check that there are contents in the files and then load them. We could potentially add another layer of validation and make sure the file is not corrupt
 
-            string jsonData = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Aqaurium.dat");
+            string jsonData = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "Aquarium.dat");
             if (!string.IsNullOrWhiteSpace(jsonData))
             {
                 Aquarium.AquariumList = JsonSerializer.Deserialize<List<AquariumClass.AquariumObject>>(jsonData);
