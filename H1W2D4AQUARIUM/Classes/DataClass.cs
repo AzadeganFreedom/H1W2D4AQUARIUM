@@ -21,9 +21,9 @@ namespace H1W2D4AQUARIUM.Classes
                 File.Create(AppDomain.CurrentDomain.BaseDirectory + "Fish.dat");
             }
 
-            if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "Aqaurium.dat"))
+            if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "Aquarium.dat"))
             {
-                File.Create(AppDomain.CurrentDomain.BaseDirectory + "Aqaurium.dat");
+                File.Create(AppDomain.CurrentDomain.BaseDirectory + "Aquarium.dat");
             }
 ;
             LoadData();
