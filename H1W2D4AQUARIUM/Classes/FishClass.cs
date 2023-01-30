@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static H1W2D4AQUARIUM.Classes.AquariumClass;
-using static System.Collections.Specialized.BitVector32;
-
-namespace H1W2D4AQUARIUM.Classes
+﻿namespace H1W2D4AQUARIUM.Classes
 {
     internal class FishClass
     {
         public DataClass Data;
-        public AquariumClass Aquarium;
-        public List<FishObject> FishList = new List<FishObject>();
         public MenuClass Menu;
+        public UiClass Ui;
+        public AquariumClass Aquarium;
 
+        public List<FishObject> FishList = new List<FishObject>();
+        public List<SpeciesObject> SpeciesList = new List<SpeciesObject>();
 
-        public void ShowCreateFishViewModel()
+        public void ShowAddFishViewModel()
         {
             // Used as context/sub menu when the Add Fish menu is hovered
             Console.WriteLine("Fish:\n");
@@ -25,24 +19,16 @@ namespace H1W2D4AQUARIUM.Classes
             if (Aquarium.AquariumList.Count == 0)
             {
                 Console.Write("You need to have an aquarium before you can get fish, or they will");
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.Write(" DIE!!");
-                Console.ForegroundColor = ConsoleColor.Gray;
+                Ui.ChangeTextColor(" DIE!!", ConsoleColor.DarkRed);
                 return;
             }
 
-            string output =
-                "Name: \n" +
-                "Species: \n" +
-                "Watertype f/s: \n" +
-                "Aquarium: \n";
+            Ui.ApplyViewModel(MenuClass.ViewModel.AddFish);
 
-            Console.WriteLine(output);
             Console.WriteLine();
 
             // Displays an overview over the aquariums
-            Console.Write(Aquarium.ShowAquariumList());
-
+            Aquarium.ShowAquariumList();
         }
 
         public void AddFish()
@@ -58,17 +44,48 @@ namespace H1W2D4AQUARIUM.Classes
             int startingLine = 5;
             Console.SetCursorPosition(0, startingLine);
 
-            string output =
-                "Name: \n" +
-                "Species: \n" +
-                "Watertype f/s: \n" +
-                "Aquarium: \n";
+            Ui.ApplyViewModel(MenuClass.ViewModel.AddFish);
 
-            Console.WriteLine(output);
             Console.WriteLine();
-            Console.Write(Aquarium.ShowAquariumList());
+            Aquarium.ShowAquariumList();
 
             // Name input is valid?
+            GetFishName(NewFish, startingLine);
+
+            // Species input is valid?. We might want to add a species "selecter" instead
+            int selectedIndex = SelectSpecies(NewFish, startingLine);
+
+            // Watertype
+            NewFish.Watertype = SpeciesList[selectedIndex].SpeciesWatertype;
+
+            // Aquarium
+            SelectAquarium(NewFish, startingLine);
+
+            // Checks to make sure the fish can actually live in the aquarium. We might want to do a size check as well
+            CheckWaterType(NewFish);
+        }
+
+        private void CheckWaterType(FishObject NewFish)
+        {
+            if (NewFish.Watertype == Aquarium.GetAquariumDetails(null, NewFish.AquariumId).Watertype)
+            {
+                NewFish.FishId = FindAvailableId();
+                FishList.Add(NewFish);
+                Data.SaveData("fish");
+                Menu.MenuItemIsActive = false;
+                return;
+            }
+
+            // Mismatched watertype between fish and aquarium
+            Console.Clear();
+            Console.WriteLine("\nYou put the fish in the wrong tank and it died\n");
+            Ui.ChangeTextColor("YOU MONSTER !!!", Console.ForegroundColor);
+            Console.CursorVisible = false;
+            Console.ReadKey();
+        }
+
+        private void GetFishName(FishObject NewFish, int startingLine)
+        {
             while (true)
             {
                 Console.SetCursorPosition(15, startingLine + 0);
@@ -86,77 +103,119 @@ namespace H1W2D4AQUARIUM.Classes
                     break;
                 }
             }
+        }
 
-            // Species input is valid?. We might want to add a species "selecter" instead
+        private int SelectSpecies(FishObject NewFish, int startingLine)
+        {
+            int selectedIndex = 0;
             while (true)
             {
+                bool speciesIsSelected = false;
+
+                // Clearing the species line
                 Console.SetCursorPosition(15, startingLine + 1);
-                string input = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(input))
-                {
-                    if (input.Length > 15)
-                    {
-                        NewFish.Species = input.Substring(0, 15);
-                    }
-                    else
-                    {
-                        NewFish.Species = input;
-                    }
-                    break;
-                }
-            }
+                Console.Write("                      (use left and right arrow keys, enter to confirm)");
 
-            // Watertype input is valid?. We might want to translate input to "Freshwater" and "Saltwater"
-            while (true)
-            {
+                // Show the currently selected species
+                Console.SetCursorPosition(15, startingLine + 1);
+                Console.Write(SpeciesList[selectedIndex].SpeciesName);
+
+
                 Console.SetCursorPosition(15, startingLine + 2);
-                string input = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(input))
+                Console.Write(SpeciesList[selectedIndex].SpeciesWatertype + "  ");
+
+
+                ConsoleKeyInfo consoleKey;
+
+                Console.CursorVisible = false;
+                consoleKey = Console.ReadKey(true);
+
+                switch (consoleKey.Key)
                 {
-                    if (input.ToLower() == "f" || input.ToLower() == "s")
-                    {
-                        NewFish.Watertype = input;
-                    }
+                    case ConsoleKey.LeftArrow:
+                        if (selectedIndex > 0)
+                        {
+                            selectedIndex--;
+                        }
+                        break;
+
+                    case ConsoleKey.RightArrow:
+                        if (selectedIndex < SpeciesList.Count - 1)
+                        {
+                            selectedIndex++;
+                        }
+                        break;
+
+                    case ConsoleKey.Enter:
+                        speciesIsSelected = true;
+                        break;
+                }
+
+                if (speciesIsSelected)
+                {
+                    NewFish.Species = SpeciesList[selectedIndex].SpeciesName;
+                    Console.CursorVisible = true;
+                    break;
+                }
+
+            }
+
+            return selectedIndex;
+        }
+
+        private void SelectAquarium(FishObject NewFish, int startingLine)
+        {
+            int selectedIndex = 0;
+            while (true)
+            {
+                bool aquariumSelected = false;
+
+                // Clearing the aquarium line
+                Console.SetCursorPosition(15, startingLine + 3);
+                Console.Write("                      (use left and right arrow keys, enter to confirm)");
+
+                // Show the currently selected aquarium
+                Console.SetCursorPosition(15, startingLine + 3);
+
+                //TODO move the handling of this to the UiClass
+                Console.ForegroundColor = NewFish.Watertype == Aquarium.AquariumList[selectedIndex].Watertype ? ConsoleColor.DarkGreen : ConsoleColor.Red;
+                Console.Write(Aquarium.AquariumList[selectedIndex].AquariumId + " " + Aquarium.AquariumList[selectedIndex].Name);
+                Console.ForegroundColor = ConsoleColor.Gray;
+
+
+                Console.SetCursorPosition(15, startingLine + 3);
+                ConsoleKeyInfo consoleKey;
+
+                Console.CursorVisible = false;
+                consoleKey = Console.ReadKey(true);
+
+                switch (consoleKey.Key)
+                {
+                    case ConsoleKey.LeftArrow:
+                        if (selectedIndex > 0)
+                        {
+                            selectedIndex--;
+                        }
+                        break;
+
+                    case ConsoleKey.RightArrow:
+                        if (selectedIndex < Aquarium.AquariumList.Count - 1)
+                        {
+                            selectedIndex++;
+                        }
+                        break;
+
+                    case ConsoleKey.Enter:
+                        aquariumSelected = true;
+                        break;
+                }
+
+                if (aquariumSelected)
+                {
+                    NewFish.AquariumId = Aquarium.AquariumList[selectedIndex].AquariumId;
                     break;
                 }
             }
-
-            // Aquarium check if input can be converted to int. Then checks if the Aquarium exist
-            int aquarium = 0;
-            while (true)
-            {
-                Console.SetCursorPosition(15, startingLine + 3);
-                string input = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(input))
-                {
-                    if (int.TryParse(input, out aquarium) && Aquarium.DoAquariumExist(aquarium))
-                    {
-                        NewFish.Aquarium = aquarium;
-                        break;
-                    }
-                }
-            }
-
-            // Checks to make sure the fish can actually live in the aquarium. We might want to do a size check as well
-            if (NewFish.Watertype == Aquarium.GetAquariumDetails(null, NewFish.Aquarium).Watertype)
-            {
-                NewFish.FishId = FindAvailableId();
-                FishList.Add(NewFish);
-                Data.SaveData("fish");
-                Menu.MenuItemIsActive = false;
-                return;
-            }
-
-            // Mismatched watertype between fish and aquarium
-            Console.Clear();
-            Console.WriteLine("\nYou put the fish in the wrong tank and it died\n");
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("YOU MONSTER !!!");
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.CursorVisible = false;
-            Console.ReadKey();
-
-
         }
 
         public void RemoveFish(int fishPos)
@@ -164,13 +223,9 @@ namespace H1W2D4AQUARIUM.Classes
             // Removes the fish
 
             // Warns the user that they are about to delete some data
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("You are currently trying to delete this item :");
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
-            Console.WriteLine(GetFriendlyName(FishList[fishPos].FishId));
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine("This action cannot be undone. \n are you sure this is what you want to do?");
-            Console.ForegroundColor = ConsoleColor.Gray;
+            Ui.ChangeTextColor("You are currently trying to delete this item :", ConsoleColor.DarkRed);
+            Ui.ChangeTextColor(GetFriendlyName(FishList[fishPos].FishId) + "\n", ConsoleColor.DarkBlue);
+            Ui.ChangeTextColor("This action cannot be undone. \n are you sure this is what you want to do?\n", ConsoleColor.DarkRed);
             Console.WriteLine("y/n");
 
             // Checks for user confirmation
@@ -184,7 +239,6 @@ namespace H1W2D4AQUARIUM.Classes
                 Menu.MenuItemIsActive = false;
                 Menu.ShowMenu();
             }
-
         }
 
         public string GetFriendlyName(int id)
@@ -199,10 +253,9 @@ namespace H1W2D4AQUARIUM.Classes
                 }
             }
             return null;
-
         }
 
-        public string ShowFishList()
+        public void ShowFishList()
         {
             // Writes list of all fish to the console
             // We no longer need a return type as we changed the method from GetFishList to ShowFishList
@@ -212,8 +265,7 @@ namespace H1W2D4AQUARIUM.Classes
             // Before we try to write 
             if (FishList.Count == 0)
             {
-                Console.WriteLine("You got no fish yet :-(");
-                return "";
+                Console.WriteLine("You got no fish yet :-("); ;
             }
 
             Console.WriteLine("Fish:\n");
@@ -226,24 +278,18 @@ namespace H1W2D4AQUARIUM.Classes
             {
                 FishObject fish = FishList[i];
 
+                output = Convert.ToString(fish.FishId).PadRight(5) + fish.Name.PadRight(15) + fish.Species.PadRight(12) + Aquarium.GetFriendlyName(fish.AquariumId).PadRight(25) + fish.Watertype + "\n";
+
                 // Apply the hover effect if the fish is currently selected
                 if (Menu.MenuItemIsActive && Menu.VerticalMenuItemSelected == i)
                 {
-                    Menu.HoverEffect(true);
+                    Ui.ApplyPredefinedEffect(output, UiClass.VisualEffects.HoverEffect);
                 }
-
-                output = Convert.ToString(fish.FishId).PadRight(5) + fish.Name.PadRight(15) + fish.Species.PadRight(12) + Aquarium.GetFriendlyName(fish.Aquarium).PadRight(25) + fish.Watertype;
-                Console.WriteLine(output);
-
-                // Ensures that the hover effect is only applied to the relevant line
-                if (Menu.MenuItemIsActive)
+                else
                 {
-                    Menu.HoverEffect(false);
+                    Console.Write(output);
                 }
-
             }
-
-            return "";
         }
 
         private int FindAvailableId()
@@ -262,13 +308,68 @@ namespace H1W2D4AQUARIUM.Classes
             return nextId;
         }
 
+        public void BuildSpeciesList()
+        {
+            SpeciesList.Add(new SpeciesObject
+            {
+                SpeciesName = "Neon tetra",
+                SpeciesWatertype = "Freshwater",
+                SpeciesSize = 1
+            });
+
+            SpeciesList.Add(new SpeciesObject
+            {
+                SpeciesName = "Guppy",
+                SpeciesWatertype = "Freshwater",
+                SpeciesSize = 2
+            });
+
+
+            SpeciesList.Add(new SpeciesObject
+            {
+                SpeciesName = "Goldfish",
+                SpeciesWatertype = "Freshwater",
+                SpeciesSize = 5
+            });
+
+
+            SpeciesList.Add(new SpeciesObject
+            {
+                SpeciesName = "Clownfish",
+                SpeciesWatertype = "Saltwater",
+                SpeciesSize = 3
+            });
+
+
+            SpeciesList.Add(new SpeciesObject
+            {
+                SpeciesName = "Flame Angelfish",
+                SpeciesWatertype = "Saltwater",
+                SpeciesSize = 4
+            });
+
+            SpeciesList.Add(new SpeciesObject
+            {
+                SpeciesName = "Blue Tang",
+                SpeciesWatertype = "Saltwater",
+                SpeciesSize = 6
+            });
+        }
+
         public class FishObject
         {
             public int FishId { get; set; }
             public string Name { get; set; }
-            public int Aquarium { get; set; }
+            public int AquariumId { get; set; }
             public string Species { get; set; }
             public string Watertype { get; set; }
+        }
+
+        public class SpeciesObject
+        {
+            public string SpeciesName { get; set; }
+            public string SpeciesWatertype { get; set; }
+            public int SpeciesSize { get; set; }
         }
     }
 }

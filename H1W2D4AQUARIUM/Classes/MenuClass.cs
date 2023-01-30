@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace H1W2D4AQUARIUM.Classes
+﻿namespace H1W2D4AQUARIUM.Classes
 {
     internal class MenuClass
     {
         public AquariumClass Aquarium;
         public FishClass Fish;
         public DataClass Data;
+        public UiClass Ui;
         public ViewModel CurrentViewModel { get; set; } // Determines what text the console loads
 
         public int HorizontalMenuItemSelected = 0; // Used for main menu navigation
@@ -20,20 +13,7 @@ namespace H1W2D4AQUARIUM.Classes
 
         public bool MenuItemIsActive = false; // Keeps track of wether or not we are inside a sub menu
 
-        public enum ViewModel
-        {
-            FishList,
-            AddFish,
-            RemoveFish,
-            Data,
-            AquariumList,
-            AquariumDetails,
-            AddAquarium,
-            RemoveAquarium,
-            Exit
-        }
-
-        string[] menuItems = new string[] { "Show Aquariums", "Show Fish", "Add Aquarium", "Remove Aquarium", "Add Fish", "Remove Fish", "Exit" };
+        private string[] menuItems = new string[] { "Show Aquariums", "Show Fish", "Add Aquarium", "Remove Aquarium", "Add Fish", "Remove Fish", "Exit" };
 
         public void ShowMenu()
         {
@@ -51,20 +31,14 @@ namespace H1W2D4AQUARIUM.Classes
                 {
                     // If the current menu items is selected and no submenu is active. Main menu item gets highlighted
                     Console.Write(" ");
-                    HoverEffect(true);
-                    Console.Write(menuItems[i]);
-                    HoverEffect(false);
-
+                    Ui.ApplyPredefinedEffect(menuItems[i], UiClass.VisualEffects.HoverEffect);
                     Console.Write(" |");
                 }
                 else if (HorizontalMenuItemSelected == i && MenuItemIsActive)
                 {
                     // If the current menu items is selected and a submenu is active. Main menu item gets inactive effect applied
                     Console.Write(" ");
-                    ApplyInactiveEffect(true);
-                    Console.Write(menuItems[i]);
-                    ApplyInactiveEffect(false);
-
+                    Ui.ApplyPredefinedEffect(menuItems[i], UiClass.VisualEffects.InactiveEffect);
                     Console.Write(" |");
                 }
                 else
@@ -76,11 +50,10 @@ namespace H1W2D4AQUARIUM.Classes
 
             // Adding a line to seperate the main menu from the context menu. Then sets cursor pos so context menu gets displayed in the correct position
             Console.SetCursorPosition(0, 1);
-            DrawLine();
+            Ui.DrawMenuLine();
             Console.SetCursorPosition(0, 3);
 
             LoadViewModel(CurrentViewModel);
-
         }
 
 
@@ -101,7 +74,7 @@ namespace H1W2D4AQUARIUM.Classes
                 case ViewModel.AddFish:
                     if (!MenuItemIsActive)
                     {
-                        Fish.ShowCreateFishViewModel();
+                        Fish.ShowAddFishViewModel();
                     }
                     else if (Aquarium.AquariumList.Count > 0)
                     {
@@ -135,52 +108,9 @@ namespace H1W2D4AQUARIUM.Classes
                 case ViewModel.RemoveAquarium:
                     Aquarium.ShowAquariumList();
                     return;
-
             }
-
-
         }
 
-        public void ApplyInactiveEffect(bool apply)
-        {
-            // Used on the main menu item when a context/sub menu is active
-
-            if (apply)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.BackgroundColor = ConsoleColor.Black;
-                return;
-            }
-
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.Gray;
-        }
-
-        public void HoverEffect(bool apply)
-        {
-            // Apply a highlight effect to the currently select menu items
-
-            if (apply)
-            {
-                Console.BackgroundColor = ConsoleColor.Blue;
-                Console.ForegroundColor = ConsoleColor.White;
-                return;
-            }
-
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.Gray;
-        }
-
-        private void DrawLine()
-        {
-            // Writes out a line that matches the width of the console. Used to seperate main menu from context menu
-
-            for (int i = 0; i < Console.WindowWidth; i++)
-            {
-                Console.Write("-");
-            }
-
-        }
         public void SelectMenuItem()
         {
             // Used for menu navigation
@@ -229,8 +159,6 @@ namespace H1W2D4AQUARIUM.Classes
                 default:
                     break;
             }
-
-
         }
 
         private void PressEnterOnActiveMenu()
@@ -408,5 +336,17 @@ namespace H1W2D4AQUARIUM.Classes
             return false;
         }
 
+        public enum ViewModel
+        {
+            FishList,
+            AddFish,
+            RemoveFish,
+            Data,
+            AquariumList,
+            AquariumDetails,
+            AddAquarium,
+            RemoveAquarium,
+            Exit
+        }
     }
 }
